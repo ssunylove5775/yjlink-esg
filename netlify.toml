@@ -1,0 +1,6 @@
+# Netlify 설정 파일 — 서버 기능(Functions) 위치를 알려줍니다.
+# 이 파일이 있어야 netlify/functions 폴더의 코드가 작동합니다.
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
