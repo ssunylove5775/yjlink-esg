@@ -545,8 +545,8 @@ footer{margin-top:44px; text-align:center; font-size:13px; color:var(--ink-soft)
 
         <!-- 부서 편집기 -->
         <div class="dept-edit" id="deptEdit" hidden>
-          <p class="section-mini-title">부서 이름과 인원을 직접 고칠 수 있어요</p>
-          <div class="dehead"><span>부서 이름</span><span style="text-align:right">인원(명)</span>
+          <p class="section-mini-title">부서 이름과 참여 인원을 직접 고칠 수 있어요</p>
+          <div class="dehead"><span>부서 이름</span><span style="text-align:right">참여 인원(명)</span>
             <span style="text-align:right">누적(kg)</span><span></span></div>
           <div id="deptRows"></div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
@@ -554,12 +554,12 @@ footer{margin-top:44px; text-align:center; font-size:13px; color:var(--ink-soft)
             <button class="qbtn solid" id="btnDeptSave" type="button">저장하기</button>
             <button class="qbtn danger" id="btnDeptReset" type="button">기본값으로 되돌리기</button>
           </div>
-          <p class="hint">누적(kg)은 캠페인 시작 시점의 기준값이에요. 처음 도입하실 땐 모두 0으로 두셔도 됩니다.</p>
+          <p class="hint">«참여 인원»은 전 직원 수가 아니라 캠페인에 실제로 참여하는 인원이에요.<br />누적(kg)은 캠페인 시작 시점의 기준값이에요. 처음 도입하실 땐 모두 0으로 두셔도 됩니다.</p>
         </div>
 
         <div id="deptList" style="margin-top:16px;"></div>
         <p class="hint" style="text-align:center;margin-top:12px;">
-          달성률 = 부서 누적 감축량 ÷ 부서 목표(인당 <span id="perGoal">40</span>kg)
+          달성률 = 부서 누적 감축량 ÷ 부서 목표(참여 인원 1명당 <span id="perGoal">48</span>kg)
         </p>
       </div>
     </section>
@@ -669,8 +669,10 @@ const FACTORS = {
   PINE_KG_PER_YEAR:    6.6,    // 소나무 1그루 연간 CO₂ 흡수량 (kg)  ← 출처 확인 후 수정 필요
   PHONE_KG_PER_CHARGE: 0.005   // 스마트폰 1회 완충 전력 (kg CO₂)     ← 출처 확인 후 수정 필요
 };
-const MONTHLY_GOAL_KG = 1000;      // 이번 달 전사 목표(kg)
-const DEPT_GOAL_PER_PERSON = 40;   // 부서 목표 = 인원 × 40kg
+/* 목표값 산출 근거 — 기획서 기대효과 «1인당 연 48kg» 기준
+   참여 인원 50명 × 월 4kg = 월 200kg */
+const MONTHLY_GOAL_KG = 200;       // 이번 달 전사 목표(kg) ← 참여 인원이 바뀌면 함께 조정
+const DEPT_GOAL_PER_PERSON = 48;   // 부서 목표 = 참여 인원 × 연 48kg
 
 /* ── 계산기 항목 : g = 1단위당 절감량(g CO₂)  ← 전부 예시값, 출처 확인 후 수정 필요
    항목을 추가/삭제하려면 이 배열만 고치면 화면이 자동으로 만들어집니다. ── */
@@ -994,7 +996,7 @@ const NEWS = [
     src:'예시 · 사내 캠페인 공지' },
   { cat:'캠페인', icon:'📣', title:'부서 대항 디지털 다이어트 리그',
     summary:'부서별 달성률로 순위를 겨뤄요.',
-    body:'인원수 차이를 고려해 «인당 감축량» 기준으로도 함께 보여드립니다. 우리 부서 순위는 «부서 현황» 탭에서 확인하세요!',
+    body:'참여 인원 차이를 고려해 «인당 감축량» 기준으로도 함께 보여드립니다. 우리 부서 순위는 «부서 현황» 탭에서 확인하세요!',
     src:'예시 · 사내 캠페인 공지' }
 ];
 /* ── 환경일보 최신 기사 자동 불러오기 ──────────────────────────────
@@ -1032,15 +1034,17 @@ async function fetchNews(){
 /* ═══════════════════════════════════════════════════════════════════════
    [6] 부서 기본값 — 화면에서 직접 수정할 수 있고, 수정본은 브라우저에 저장됩니다.
    ═══════════════════════════════════════════════════════════════════════ */
+/* members = 실제 «캠페인 참여 인원» (전 직원 수가 아님)
+   kg      = 캠페인 시작 시점의 기준값. 2개월 시범운영 가정(인당 8kg)으로 잡았습니다.
+             ⚠️ 실제로 처음 도입하실 땐 kg 을 모두 0 으로 두세요.
+             산출 근거 : 기획서 기대효과 «1인당 연 48kg» ÷ 12개월 = 월 4kg × 2개월 */
 const DEFAULT_DEPARTMENTS = [
-  { id:'esg',   name:'ESG추진팀',  members:12, kg:512 },
-  { id:'dev',   name:'개발팀',     members:38, kg:1180 },
-  { id:'sales', name:'영업팀',     members:26, kg:640 },
-  { id:'mkt',   name:'마케팅팀',   members:18, kg:590 },
-  { id:'hr',    name:'인사팀',     members:11, kg:298 },
-  { id:'fin',   name:'재무팀',     members:14, kg:470 },
-  { id:'ops',   name:'경영지원팀', members:22, kg:520 },
-  { id:'cs',    name:'고객지원팀', members:30, kg:735 }
+  { id:'dev',   name:'개발팀',     members:6,  kg:48 },
+  { id:'sales', name:'영업팀',     members:10, kg:80 },
+  { id:'mkt',   name:'마케팅팀',   members:12, kg:96 },
+  { id:'hr',    name:'인사팀',     members:7,  kg:56 },
+  { id:'fin',   name:'재무팀',     members:9,  kg:72 },
+  { id:'ops',   name:'경영지원팀', members:6,  kg:48 }
 ];
 /** 현재 부서 목록 (사용자 수정본 우선) */
 function getDepartments(){
@@ -1048,9 +1052,10 @@ function getDepartments(){
 }
 async function fetchCompanyStats(){
   // ── 더미 데이터 (여기를 fetch('/api/...') 로 교체) ──
-  const daily7 = [], base = [58,72,41,96,83,64,77];
+  // 참여 인원 50명 × 하루 0.2kg 안팎을 가정한 값입니다.
+  const daily7 = [], base = [11.6,14.4,8.2,12.1,9.7,4.3,5.2];
   for(let i=6;i>=0;i--){ const d=new Date(); d.setDate(d.getDate()-i); daily7.push({date:dateKey(d), kg:base[6-i]}); }
-  return { totalKgMonth:642.5, daily7 };
+  return { totalKgMonth:128.5, daily7 };
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -1575,7 +1580,7 @@ function renderDeptEditor(){
   $('deptRows').innerHTML = deptDraft.map((d,i) => `
     <div class="derow">
       <input type="text" value="${d.name.replace(/"/g,'&quot;')}" data-i="${i}" data-f="name" aria-label="${i+1}번째 부서 이름" />
-      <input type="number" class="num" min="1" value="${d.members}" data-i="${i}" data-f="members" aria-label="${d.name} 인원" />
+      <input type="number" class="num" min="1" value="${d.members}" data-i="${i}" data-f="members" aria-label="${d.name} 참여 인원" />
       <input type="number" class="num" min="0" step="0.1" value="${d.kg}" data-i="${i}" data-f="kg" aria-label="${d.name} 누적 감축량" />
       <button class="qbtn danger" type="button" data-del="${i}" aria-label="${d.name} 삭제">✕</button>
     </div>`).join('');
@@ -1925,19 +1930,24 @@ $('celClose').addEventListener('click', () => { $('celebrate').classList.remove(
 $('celebrate').addEventListener('click', e => { if(e.target === $('celebrate')) $('celClose').click(); });
 
 $('btnDemo').addEventListener('click', () => {
-  for(let i=13;i>=0;i--){
+  /* 시연 기간(일). 14일이면 «아기 푸리», 60일이면 «푸리» 단계까지 자랍니다.
+     «큰 나무 푸리»(20kg)를 보여드리려면 80 정도가 필요합니다. */
+  const DEMO_DAYS = 14;
+  for(let i=DEMO_DAYS-1;i>=0;i--){
     const d = new Date(); d.setDate(d.getDate()-i);
     const r = blankDay();
-    r.mailDel  = 80 + Math.floor(Math.random()*90);
-    r.cloudGb  = 2 + Math.random()*4;
-    r.videoMin = 20 + Math.floor(Math.random()*50);
-    r.tabClose = 10 + Math.floor(Math.random()*20);
+    /* 열심히 참여하는 임직원 1명의 하루치. 하루 약 0.2~0.4kg 수준으로,
+       기획서 기대효과(1인당 월 4kg)의 2배가량 되는 «모범 참여자» 기준입니다. */
+    r.mailDel  = 15 + Math.floor(Math.random()*26);   // 15~40통
+    r.cloudGb  = 0.1 + Math.random()*0.4;             // 0.1~0.5GB
+    r.videoMin = 15 + Math.floor(Math.random()*31);   // 15~45분
+    r.tabClose = 5  + Math.floor(Math.random()*11);   // 5~15개
     r.kg = gramsOf(r)/1000;
     store.records[dateKey(d)] = r;
   }
   store.lastVisit = todayKey(); saveStore();
   renderStatus(); renderMissions(); renderDashboard(); renderSpecies(); renderCollection();
-  toast('시연용 2주치 기록을 채웠어요!'); setFace('excited',2500); confetti(20);
+  toast(`시연용 ${DEMO_DAYS}일치 기록을 채웠어요!`); setFace('excited',2500); confetti(20);
 });
 $('btnReset').addEventListener('click', () => {
   if(!confirm('내 기록을 모두 지울까요? 되돌릴 수 없어요.')) return;
