@@ -83,6 +83,14 @@ svg{shape-rendering:crispEdges;}
 .card-body{margin-top:12px;}
 .hint{font-size:14px; color:var(--ink-soft); margin:4px 0 0;}
 .section-mini-title{font-size:16px; color:var(--green); margin:0 0 10px;}
+
+/* ── 첫 방문자 온보딩 바 ───────────────────────── */
+.onboard{display:flex; align-items:center; justify-content:center; gap:12px; flex-wrap:wrap;
+  margin-top:20px; padding:11px 16px; background:var(--card2);
+  border:2px dashed var(--lime-deep); border-radius:var(--radius);}
+.onboard-txt{font-size:13.5px; color:var(--ink-soft);}
+@media (max-width:560px){ .onboard{flex-direction:column; gap:9px;} }
+
 .panel{animation:fadeUp .3s steps(5);}
 @keyframes fadeUp{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:translateY(0)}}
 
@@ -460,6 +468,12 @@ footer{margin-top:44px; text-align:center; font-size:13px; color:var(--ink-soft)
 </div>
 
 <div class="wrap">
+
+  <!-- 첫 방문자 온보딩 — 기록이 하나도 없을 때만 보입니다 -->
+  <div class="onboard" id="onboard" hidden>
+    <span class="onboard-txt">처음이신가요? 샘플 기록으로 푸리의 성장과 도감을 미리 볼 수 있어요.</span>
+    <button class="qbtn solid" id="btnTour" type="button">🎬 둘러보기</button>
+  </div>
 
   <!-- ══════════ 히어로 ══════════ -->
   <div class="hero" id="hero">
@@ -1990,7 +2004,9 @@ $('puriHolder').addEventListener('keydown', e => { if(e.key==='Enter'||e.key==='
 $('celClose').addEventListener('click', () => { $('celebrate').classList.remove('show'); setFace(baseFace()); });
 $('celebrate').addEventListener('click', e => { if(e.target === $('celebrate')) $('celClose').click(); });
 
-$('btnDemo').addEventListener('click', () => {
+/* 시연용 2주치 기록 만들기 — 푸터의 «시연용 데이터 채우기»와
+   첫 방문자 온보딩 바의 «둘러보기»가 같은 함수를 씁니다. */
+function fillDemoData(){
   /* 시연 기간(일). 14일이면 «아기 푸리», 60일이면 «푸리» 단계까지 자랍니다.
      «큰 나무 푸리»(20kg)를 보여드리려면 80 정도가 필요합니다. */
   const DEMO_DAYS = 14;
@@ -2008,14 +2024,29 @@ $('btnDemo').addEventListener('click', () => {
   }
   store.lastVisit = todayKey(); saveStore();
   renderStatus(); renderMissions(); renderDashboard(); renderSpecies(); renderCollection();
+  refreshOnboard();
   toast(`시연용 ${DEMO_DAYS}일치 기록을 채웠어요!`); setFace('excited',2500); confetti(20);
+}
+$('btnDemo').addEventListener('click', fillDemoData);
+$('btnTour').addEventListener('click', () => {
+  fillDemoData();
+  $('hero').scrollIntoView({ behavior:'smooth', block:'start' });
 });
+
+/* 온보딩 바 — 기록이 하나도 없을 때만 보여줍니다 */
+function refreshOnboard(){
+  const el = $('onboard');
+  if(el) el.hidden = Object.keys(store.records).length > 0;
+}
+refreshOnboard();
+
 $('btnReset').addEventListener('click', () => {
   if(!confirm('내 기록을 모두 지울까요? 되돌릴 수 없어요.')) return;
   localStorage.removeItem(STORE_KEY);
   store = loadStore(); deptDraft = null;
   $('deptSelect').innerHTML = '';
   renderStatus(); renderMissions(); renderDashboard(); renderSpecies(); renderCollection();
+  refreshOnboard();          // 기록이 비었으니 온보딩 바가 다시 나타납니다
   toast('기록을 초기화했어요.');
 });
 
