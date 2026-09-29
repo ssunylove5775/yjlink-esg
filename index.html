@@ -404,6 +404,25 @@ select.pix{font-size:15px; color:var(--ink); background:#fff;
 footer{margin-top:44px; text-align:center; font-size:13px; color:var(--ink-soft); line-height:1.9;}
 .tools{display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:12px;}
 
+/* ── 계산 근거와 출처 (접히는 영역) ───────────── */
+.srcbox{max-width:760px; margin:20px auto 0; text-align:left;}
+.srcbox summary{cursor:pointer; text-align:center; font-size:13px; color:var(--ink-soft);
+  padding:8px 14px; border:2px solid var(--lime-soft); border-radius:var(--radius);
+  background:var(--card2); list-style:none; transition:border-color .15s;}
+.srcbox summary::-webkit-details-marker{display:none;}
+.srcbox summary:hover{border-color:var(--lime);}
+.srcbox summary::after{content:' ⌄';}
+.srcbox[open] summary::after{content:' ⌃';}
+.srcbox .inner{margin-top:10px; padding:16px 18px; background:var(--card);
+  border:2px solid var(--lime-soft); border-radius:var(--radius); font-size:12.5px; line-height:1.75;}
+.srcbox table{width:100%; border-collapse:collapse; margin:8px 0 14px;}
+.srcbox th,.srcbox td{padding:5px 7px; border-bottom:1px solid var(--lime-soft); text-align:left;}
+.srcbox th{color:var(--green); font-size:12px;}
+.srcbox td:nth-child(2){text-align:right; white-space:nowrap; color:var(--ink);}
+.srcbox .ref{color:var(--ink-soft); font-size:12px;}
+.srcbox a{color:var(--green); word-break:break-all;}
+.srcbox .note{margin-top:12px; padding-top:10px; border-top:1px dashed var(--beige-deep); color:var(--ink-soft);}
+
 /* ── 반응형 ──────────────────────────────────── */
 @media (max-width:1000px){
   .hero{grid-template-columns:1fr;}
@@ -645,6 +664,34 @@ footer{margin-top:44px; text-align:center; font-size:13px; color:var(--ink-soft)
   <footer>
     개인 기록은 이 브라우저(localStorage)에만 저장되며 서버로 전송되지 않아요.<br />
     글꼴 : 림글(Limgul) · SIL Open Font License 1.1
+    <details class="srcbox">
+      <summary>📊 계산 근거와 출처</summary>
+      <div class="inner">
+        <table>
+          <thead><tr><th>항목</th><th>계수</th><th>출처</th></tr></thead>
+          <tbody>
+            <tr><td>삭제한 메일</td><td>1통 4g</td><td class="ref">환경부·한국에너지공단</td></tr>
+            <tr><td>클라우드 정리</td><td>1GB 63g</td><td class="ref">Obringer 외(2021) 상한값</td></tr>
+            <tr><td>사내 서버·PC 정리</td><td>1GB 28g</td><td class="ref">Obringer 외(2021) 하한값</td></tr>
+            <tr><td>불필요한 백업 정리</td><td>1GB 45g</td><td class="ref">Obringer 외(2021) 중간값</td></tr>
+            <tr><td>화상회의 비디오 끄기</td><td>1분 2.5g</td><td class="ref">Obringer 외(2021) · 1시간 148.5g</td></tr>
+            <tr><td>소나무 환산</td><td>1그루 연 6.6kg</td><td class="ref">국립산림과학원 (30년생 기준)</td></tr>
+          </tbody>
+        </table>
+        <p class="ref">
+          · <b>Obringer, R. et al. (2021)</b> “The overlooked environmental footprint of increasing Internet use”,
+          <i>Resources, Conservation and Recycling</i> Vol.167 — 인터넷 데이터 사용 GB당 28~63g CO₂e,
+          화상회의 비디오를 끄면 해당 회의 배출량의 96% 감축<br />
+          · 이메일 계수는 환경부·한국에너지공단 자료를 <a href="https://www.korea.kr/news/policyNewsView.do?newsId=148896769" target="_blank" rel="noopener">대한민국 정책브리핑</a>에서 인용<br />
+          · 위 논문 수치는 <a href="https://together.kakao.com/events/green-digital-2023" target="_blank" rel="noopener">2023 카카오 그린 디지털 캠페인</a>이 인용한 것과 동일한 근거입니다
+        </p>
+        <p class="note">
+          표에 없는 항목(뉴스레터 해지, 중복 파일, 브라우저 탭, 앱 알림 등)은 위 출처에서 파생한 <b>추정값</b>입니다.
+          모든 수치는 평균 추정값이며 기기·사용 환경에 따라 달라질 수 있습니다.
+          부서 데이터와 사내 사례는 <b>샘플</b>입니다.
+        </p>
+      </div>
+    </details>
     <div class="tools">
       <button class="qbtn" id="btnDemo" type="button" aria-label="시연용 샘플 기록 채우기">🎬 시연용 데이터 채우기</button>
       <button class="qbtn danger" id="btnReset" type="button" aria-label="내 기록 초기화">🗑 내 기록 초기화</button>
@@ -663,10 +710,10 @@ footer{margin-top:44px; text-align:center; font-size:13px; color:var(--ink-soft)
 
 <script>
 /* ═══════════════════════════════════════════════════════════════════════
-   [2] 계산 상수 — ⚠️ 모두 예시 기준값입니다. 출처 확인 후 수정 필요
+   [2] 계산 상수 — 출처는 아래 CALC_GROUPS 주석과 푸터의 «계산 근거와 출처» 참조
    ═══════════════════════════════════════════════════════════════════════ */
 const FACTORS = {
-  PINE_KG_PER_YEAR:    6.6,    // 소나무 1그루 연간 CO₂ 흡수량 (kg)  ← 출처 확인 후 수정 필요
+  PINE_KG_PER_YEAR:    6.6,    // 30년생 소나무 1그루 연간 CO₂ 흡수량 (kg) — 국립산림과학원 기준값
   PHONE_KG_PER_CHARGE: 0.005   // 스마트폰 1회 완충 전력 (kg CO₂)     ← 출처 확인 후 수정 필요
 };
 /* 목표값 산출 근거 — 기획서 기대효과 «1인당 연 48kg» 기준
@@ -674,25 +721,34 @@ const FACTORS = {
 const MONTHLY_GOAL_KG = 200;       // 이번 달 전사 목표(kg) ← 참여 인원이 바뀌면 함께 조정
 const DEPT_GOAL_PER_PERSON = 48;   // 부서 목표 = 참여 인원 × 연 48kg
 
-/* ── 계산기 항목 : g = 1단위당 절감량(g CO₂)  ← 전부 예시값, 출처 확인 후 수정 필요
-   항목을 추가/삭제하려면 이 배열만 고치면 화면이 자동으로 만들어집니다. ── */
+/* ── 계산기 항목 : g = 1단위당 절감량(g CO₂)
+   항목을 추가/삭제하려면 이 배열만 고치면 화면이 자동으로 만들어집니다.
+
+   ◆ 출처 표기 ◆
+     [논문]  Obringer, R. et al. (2021) "The overlooked environmental footprint of
+             increasing Internet use", Resources, Conservation and Recycling Vol.167
+             → 인터넷 데이터 사용 : GB당 28~63g CO₂e
+             → 화상회의 비디오 끄기 : 1시간 회의 배출량의 96%(약 148.5g) 감축
+     [환경부] 환경부·한국에너지공단 (대한민국 정책브리핑 인용) → 이메일 1통 4g
+     [추정]  위 두 출처에서 파생했거나 근거가 확인되지 않은 값 ← 공인 계수 확보 시 교체
+   ── */
 const CALC_GROUPS = [
   { id:'mail', icon:'📧', name:'이메일 · 메신저', items:[
-    { id:'mailDel',    label:'삭제한 메일',         unit:'통', g:4,   quick:[10,50] },
+    { id:'mailDel',    label:'삭제한 메일',         unit:'통', g:4,   quick:[10,50] },   // [환경부]
     { id:'mailCc',     label:'줄인 참조(CC)',       unit:'명', g:4,   quick:[1,5] },
     { id:'newsCancel', label:'해지한 뉴스레터',      unit:'건', g:20,  quick:[1,3] },
     { id:'msgFile',    label:'정리한 메신저 파일',    unit:'개', g:3,   quick:[10,30] }
   ]},
   { id:'storage', icon:'💾', name:'저장공간', items:[
-    { id:'cloudGb',    label:'클라우드 정리',        unit:'GB', g:200, quick:[1,5], step:0.1 },
-    { id:'localGb',    label:'사내 서버 · PC 정리',  unit:'GB', g:100, quick:[1,5], step:0.1 },
+    { id:'cloudGb',    label:'클라우드 정리',        unit:'GB', g:63,  quick:[1,5], step:0.1 },  // [논문] 상한 63g/GB (외부 전송 포함)
+    { id:'localGb',    label:'사내 서버 · PC 정리',  unit:'GB', g:28,  quick:[1,5], step:0.1 },  // [논문] 하한 28g/GB (사내망)
     { id:'dupFile',    label:'중복 파일 삭제',       unit:'개', g:2,   quick:[10,50] },
-    { id:'backupGb',   label:'불필요한 백업 정리',   unit:'GB', g:150, quick:[1,5], step:0.1 }
+    { id:'backupGb',   label:'불필요한 백업 정리',   unit:'GB', g:45,  quick:[1,5], step:0.1 }   // [논문] 범위 중간값
   ]},
   { id:'meeting', icon:'🎥', name:'화상회의', items:[
-    { id:'videoMin',   label:'비디오 끈 시간',       unit:'분', g:2.5, quick:[10,30] },
+    { id:'videoMin',   label:'비디오 끈 시간',       unit:'분', g:2.5, quick:[10,30] },  // [논문] 148.5g ÷ 60분
     { id:'linkShare',  label:'화면공유 → 링크 대체', unit:'회', g:30,  quick:[1,3] },
-    { id:'recDel',     label:'삭제한 회의 녹화본',   unit:'건', g:250, quick:[1,2] }
+    { id:'recDel',     label:'삭제한 회의 녹화본',   unit:'건', g:100, quick:[1,2] }   // [논문] 1건 ≈ 1.6GB × 63g
   ]},
   { id:'web', icon:'🌐', name:'웹 · 기기', items:[
     { id:'tabClose',   label:'닫은 브라우저 탭',     unit:'개', g:1.5, quick:[5,10] },
