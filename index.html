@@ -658,7 +658,7 @@ footer{margin-top:44px; text-align:center; font-size:13px; color:var(--ink-soft)
   <!-- ══════════ 탭 4 : ESG 소식 ══════════ -->
   <div id="panel-news" class="panel" role="tabpanel" aria-labelledby="tab-news" hidden>
     <section class="card hoverable" aria-labelledby="newsTitle">
-      <div class="ribbon-label" id="newsTitle">ESG 소식 &amp; 사례</div>
+      <div class="ribbon-label" id="newsTitle">ESG &amp; 회사 소식</div>
       <div class="card-body">
         <div class="chips" id="newsChips" role="group" aria-label="소식 분류 필터"></div>
 
@@ -702,7 +702,7 @@ footer{margin-top:44px; text-align:center; font-size:13px; color:var(--ink-soft)
         <p class="note">
           표에 없는 항목(뉴스레터 해지, 중복 파일, 브라우저 탭, 앱 알림 등)은 위 출처에서 파생한 <b>추정값</b>입니다.
           모든 수치는 평균 추정값이며 기기·사용 환경에 따라 달라질 수 있습니다.
-          부서 데이터와 사내 사례는 <b>샘플</b>입니다.
+          부서 데이터는 <b>샘플</b>이며, «캠페인» 항목은 아직 도입 전인 <b>기획안</b>입니다.
         </p>
       </div>
     </details>
@@ -980,7 +980,8 @@ const MISSIONS = [
             src:'한국경제 · 2026.08.01', url:'https://www.hankyung.com/article/...' },
      url 이 없으면 버튼은 표시되지 않으니, 사내 사례처럼 링크가 없는 글은 그대로 두시면 됩니다.
 
-   ⚠️ 아래 본문은 모두 예시(샘플)입니다. 사내 게시 전 실제 콘텐츠와 기사 링크로 교체하세요.
+   ⚠️ «실천팁»과 «캠페인»은 아직 도입 전인 기획안입니다. 실제 운영 시 사내 공지 내용으로 교체하세요.
+     «환경뉴스»와 «와이제이링크»는 서버 기능이 실시간으로 채우므로 손댈 필요가 없습니다.
    summary = 목록에 보이는 한 줄 / body = 펼쳤을 때 내용 / src = 출처 표기
    ═══════════════════════════════════════════════════════════════════════ */
 
@@ -1002,18 +1003,6 @@ const NEWS_SOURCE = {
 };
 
 const NEWS = [
-  { cat:'사내사례', icon:'🏆', title:'재무팀, 공유드라이브 1.2TB 정리',
-    summary:'중복 결산 자료를 한곳으로 모았어요.',
-    body:'부서별로 흩어져 있던 결산 자료를 한 폴더로 통합하고 중복본을 정리했습니다. 서버 용량이 줄어든 것은 물론, 자료를 찾는 시간도 함께 짧아졌다고 해요.',
-    src:'예시 · 사내 ESG 뉴스레터' },
-  { cat:'사내사례', icon:'🏆', title:'개발팀, 회의 기본값을 «비디오 OFF»로',
-    summary:'꼭 필요할 때만 카메라를 켜기로 했어요.',
-    body:'모든 정기 회의의 기본 설정을 비디오 OFF로 바꿨습니다. 발표나 논의가 필요한 순간에만 카메라를 켜니 오히려 회의 집중도가 올라갔다는 반응입니다.',
-    src:'예시 · 사내 ESG 뉴스레터' },
-  { cat:'사내사례', icon:'🏆', title:'디자인팀, 시안 파일 버전 관리 도입',
-    summary:'«최종_진짜최종» 파일을 정리했어요.',
-    body:'시안 파일을 버전 규칙에 맞춰 정리하고, 첨부 대신 링크 공유로 전환했습니다. 저장공간과 함께 팀원 간 혼선도 줄었습니다.',
-    src:'예시 · 사내 ESG 뉴스레터' },
   /* ── 환경뉴스 : 지어낸 기사가 아니라 «실제 언론사 섹션»으로 연결됩니다.
         누를 때마다 그날 올라온 최신 기사가 열리므로 링크가 낡지 않습니다. ── */
   { cat:'환경뉴스', icon:'🌏', title:'오늘의 환경뉴스 한눈에 보기',
@@ -1056,18 +1045,18 @@ const NEWS = [
     summary:'연사로 찍은 비슷한 사진부터요.',
     body:'연사로 찍은 비슷한 사진, 초점이 나간 사진만 지워도 용량이 꽤 줄어듭니다. 자동 백업까지 함께 정리하면 효과가 두 배예요.',
     src:'푸리의 5분 디지털 단식' },
-  { cat:'캠페인', icon:'📣', title:'이번 달 전사 목표 1,000kg 도전 중!',
+  { cat:'캠페인', icon:'📣', title:'이번 달 전사 목표에 도전 중!',
     summary:'달성하면 다람쥐 친구가 찾아와요.',
-    body:'전사 목표를 달성하면 푸리에게 다람쥐 친구가 도토리를 들고 찾아옵니다. 현재 진행률은 «부서 현황» 탭에서 확인할 수 있어요.',
-    src:'예시 · 사내 캠페인 공지' },
+    body:'전사 목표를 달성하면 푸리에게 다람쥐 친구가 도토리를 들고 찾아옵니다. 이번 달 목표치와 현재 진행률은 «부서 현황» 탭에서 확인할 수 있어요.',
+    src:'캠페인 기획안 · 도입 예정' },
   { cat:'캠페인', icon:'📣', title:'«금요일은 정리의 날» 운영 안내',
     summary:'매주 금요일 퇴근 30분 전에 함께해요.',
     body:'매주 금요일 퇴근 30분 전, 다 함께 메일함과 파일을 정리하는 시간을 갖습니다. 부담 없이 5분만 참여하셔도 좋아요.',
-    src:'예시 · 사내 캠페인 공지' },
+    src:'캠페인 기획안 · 도입 예정' },
   { cat:'캠페인', icon:'📣', title:'부서 대항 디지털 다이어트 리그',
     summary:'부서별 달성률로 순위를 겨뤄요.',
     body:'참여 인원 차이를 고려해 «인당 감축량» 기준으로도 함께 보여드립니다. 우리 부서 순위는 «부서 현황» 탭에서 확인하세요!',
-    src:'예시 · 사내 캠페인 공지' }
+    src:'캠페인 기획안 · 도입 예정' }
 ];
 /* ── 환경일보 최신 기사 자동 불러오기 ──────────────────────────────
    Netlify 서버 기능(/.netlify/functions/news)이 환경일보 RSS를 읽어옵니다.
@@ -1079,16 +1068,20 @@ const NEWS = [
 const NEWS_API = '/.netlify/functions/news';
 
 async function fetchNews(){
-  let live = [];
+  let data = null;
   try{
     const res = await fetch(NEWS_API);
-    if(res.ok) live = await res.json();
+    if(res.ok) data = await res.json();
   }catch(e){ /* 서버가 없거나 실패 → 아래에서 기본 카드로 대체 */ }
 
-  if(!Array.isArray(live) || !live.length) return NEWS;   // 대체 동작
+  // 예전 버전의 함수는 배열만 돌려줬습니다. 두 모양 다 받아줍니다.
+  const esg     = Array.isArray(data) ? data : (data && data.esg)     || [];
+  const company = (data && data.company) || [];
 
-  // 가져온 기사를 «환경뉴스» 카드로 변환
-  const liveCards = live.map(a => ({
+  if(!esg.length && !company.length) return NEWS;   // 대체 동작
+
+  // 환경일보 기사 → «환경뉴스» 카드
+  const esgCards = esg.map(a => ({
     cat:'환경뉴스', icon:'📰',
     title: a.title,
     summary: a.date ? `${a.date} · ${a.section || '환경일보'}` : (a.section || '환경일보'),
@@ -1097,8 +1090,18 @@ async function fetchNews(){
     url: a.link
   }));
 
-  // 실시간 기사 + 기존 사내사례·실천팁·캠페인
-  return liveCards.concat(NEWS.filter(n => n.cat !== '환경뉴스'));
+  // 와이제이링크 보도자료 → «와이제이링크 소식» 카드
+  const coCards = company.map(a => ({
+    cat:'와이제이링크', icon:'🏢',
+    title: a.title,
+    summary: a.date ? `${a.date} · 보도자료` : '보도자료',
+    body: a.summary || '와이제이링크 홈페이지에서 원문을 확인하실 수 있어요.',
+    src: `와이제이링크 보도자료 · ${a.date || ''}`.trim(),
+    url: a.link
+  }));
+
+  // 실시간 소식 + 기존 실천팁·캠페인
+  return coCards.concat(esgCards, NEWS.filter(n => n.cat !== '환경뉴스'));
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
