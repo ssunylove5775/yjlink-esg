@@ -1077,31 +1077,35 @@ async function fetchNews(){
   // 예전 버전의 함수는 배열만 돌려줬습니다. 두 모양 다 받아줍니다.
   const esg     = Array.isArray(data) ? data : (data && data.esg)     || [];
   const company = (data && data.company) || [];
+  const event   = (data && data.event)   || [];
 
-  if(!esg.length && !company.length) return NEWS;   // 대체 동작
+  if(!esg.length && !company.length && !event.length) return NEWS;   // 대체 동작
 
-  // 환경일보 기사 → «환경뉴스» 카드
-  const esgCards = esg.map(a => ({
-    cat:'환경뉴스', icon:'📰',
+  /* 카드 한 장 만들기. _date 는 정렬용으로만 쓰고 화면에는 안 나옵니다. */
+  const card = (a, cat, icon, label, fallback) => ({
+    cat, icon,
     title: a.title,
-    summary: a.date ? `${a.date} · ${a.section || '환경일보'}` : (a.section || '환경일보'),
-    body: a.summary || '환경일보에서 원문을 확인하실 수 있어요.',
-    src: `환경일보 · ${a.date || ''}`.trim(),
-    url: a.link
-  }));
+    summary: a.date ? `${a.date} · ${label}` : label,
+    body: a.summary || fallback,
+    src: `${label} · ${a.date || ''}`.trim(),
+    url: a.link,
+    _date: a.date || ''
+  });
 
-  // 와이제이링크 보도자료 → «와이제이링크 소식» 카드
-  const coCards = company.map(a => ({
-    cat:'와이제이링크', icon:'🏢',
-    title: a.title,
-    summary: a.date ? `${a.date} · 보도자료` : '보도자료',
-    body: a.summary || '와이제이링크 홈페이지에서 원문을 확인하실 수 있어요.',
-    src: `와이제이링크 보도자료 · ${a.date || ''}`.trim(),
-    url: a.link
-  }));
+  const live = [
+    ...event.map(a   => card(a, '사내 ESG 활동', '🤝', '와이제이링크 이벤트',
+                             '와이제이링크 홈페이지에서 자세히 보실 수 있어요.')),
+    ...company.map(a => card(a, '와이제이링크', '🏢', '보도자료',
+                             '와이제이링크 홈페이지에서 원문을 확인하실 수 있어요.')),
+    ...esg.map(a     => card(a, '환경뉴스', '📰', a.section || '환경일보',
+                             '환경일보에서 원문을 확인하실 수 있어요.'))
+  ];
 
-  // 실시간 소식 + 기존 실천팁·캠페인
-  return coCards.concat(esgCards, NEWS.filter(n => n.cat !== '환경뉴스'));
+  // 날짜 내림차순 — 최신 소식이 맨 위로 옵니다
+  live.sort((a,b) => (b._date || '').localeCompare(a._date || ''));
+
+  // 날짜가 없는 실천팁·캠페인은 뒤에 붙입니다
+  return live.concat(NEWS.filter(n => n.cat !== '환경뉴스'));
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -1885,14 +1889,13 @@ function renderNews(){
   const items = newsFilter === '전체' ? newsList : newsList.filter(n => n.cat === newsFilter);
   if(!items.length){ $('newsPick').innerHTML = ''; $('newsList').innerHTML = ''; return; }
 
-  // 오늘의 대표 소식 : 날짜를 시드로 매일 하나씩 바뀝니다
-  const seed = parseInt(todayKey().split('-').join(''),10);
-  const pick = items[seed % items.length];
+  // 대표 소식 : 목록이 최신순으로 정렬돼 있으므로 맨 앞(=가장 최근)을 올립니다
+  const pick = items[0];
   $('newsPick').innerHTML = `
     <div class="pick">
       <div class="picon">${pick.icon}</div>
       <div>
-        <div class="plab">🌿 오늘의 소식 · ${pick.cat}</div>
+        <div class="plab">🌿 최신 소식 · ${pick.cat}</div>
         <h4>${pick.title}</h4>
         <p>${pick.body}</p>
         <span class="src">${pick.src}${srcLink(pick)}</span>
